@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  # BACKEND SERVICES
+  # ----------------
+  # PRODUCTS Service
+  products_db:
+    image: postgres:14.1-alpine3.15
+    hostname: products_db
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./environment_files/services/products/.env.db
+  
+  products_service:
+    hostname: products-service
+    build:
+      context: ./services/django/products
+      dockerfile: ../../../docker/Dockerfile.django.dev
+    command: python manage.py runserver 0.0.0.0:9001
+    volumes:
+      - ./app/:/usr/src/app/
+      - type: bind
+        source: ./services/django/products
+        target: /app
+    ports:
+      - 9001:9001
+    working_dir: /app
+    env_file:
+      - ./environment_files/services/products/.env.service
+      - ./environment_files/services/products/.env.db
+
+
+volumes:
+  postgres_data:
+  arangodb_data_container:
+  arangodb_apps_data_container:
+  rabbitmq_data:
+  rabbitmq_logs:
