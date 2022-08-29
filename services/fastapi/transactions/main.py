@@ -6,7 +6,10 @@ from auth import AuthHandler
 from database import SessionLocal, engine
 import crud
 from sqlalchemy.orm import Session
-from producer import publish
+
+from broker import Broker
+
+message_broker = Broker()
 
 
 TransactionModel.metadata.create_all(bind=engine)
@@ -68,6 +71,8 @@ async def create_transaction(
     transaction_response = transaction_schemas.Transaction(
         **created_transaction.__dict__
     )
-    publish("transaction", f"created a transaction with: {transaction_response.json()}")
+    message_broker.publish(
+        "transaction", f"created a transaction with: {transaction_response.json()}"
+    )
 
     return created_transaction

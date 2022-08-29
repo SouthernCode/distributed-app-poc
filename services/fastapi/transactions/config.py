@@ -24,10 +24,12 @@ class Settings(BaseSettings):
     test_database_name: str = "testdb"
 
     """External services configurations"""
-    users_service_base_url = os.getenv(
+    users_service_base_url: str = os.getenv(
         "USERS_SERVICE_BASE_URL", "http://localhost:8000"
     )
-    rabbit_url = os.getenv("RABBITMQ_URL_STRING")
+    rabbit_url: str = os.getenv(
+        "RABBITMQ_URL_STRING", "amqp://R063r:r4B8170@localhost:5672/"
+    )
 
 
 @lru_cache()

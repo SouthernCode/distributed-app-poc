@@ -78,7 +78,7 @@ services:
     image: postgres:14.1-alpine3.15
     hostname: transactions-db
     ports:
-      - "5433:5432"
+      - "5434:5432" # Internal port is still 5432, the exposed one is 5434, just in case you want to connect with any db tool
     env_file:
       - ./environment_files/services/transactions/.env.db
 
@@ -92,6 +92,7 @@ services:
       - type: bind
         source: ./services/fastapi/transactions
         target: /app
+    # command: uvicorn main:app --proxy-headers --host 0.0.0.0 --port 9001 --reload
     ports:
       - 9001:9001
     working_dir: /app
@@ -101,6 +102,27 @@ services:
       - ./environment_files/generic/.env.service_urls
       - ./environment_files/services/transactions/.env.service
       - ./environment_files/services/transactions/.env.db
+
+  transactions-service-consumer:
+    hostname: transactions-service-consumer
+    build:
+      context: ./services/fastapi/transactions
+      dockerfile: ../../../docker/Dockerfile.fastapi.dev
+    volumes:
+      - ./app/:/usr/src/app/
+      - type: bind
+        source: ./services/fastapi/transactions
+        target: /app
+    command: python consumer.py
+    working_dir: /app
+    env_file:
+      - ./environment_files/generic/.env.rabbit
+      - ./environment_files/generic/.env.fastapi
+      - ./environment_files/generic/.env.service_urls
+      - ./environment_files/services/transactions/.env.service
+      - ./environment_files/services/transactions/.env.db
+    environment:
+      - IS_CONSUMER=1
 
 volumes:
   postgres_data:
