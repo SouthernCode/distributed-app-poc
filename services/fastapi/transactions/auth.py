@@ -1,7 +1,9 @@
+# import os
 import requests
-from fastapi import HTTPException, Request, Security
+from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from schemas.user_schemas import AuthUserSchema
+from config import get_settings
 
 
 class AuthHandler:
@@ -12,7 +14,7 @@ class AuthHandler:
         This function is used to decode the token.
         """
         response = requests.get(
-            "http://localhost:8000/api/externalauth/",
+            f"{get_settings().users_service_base_url}/api/externalauth/",
             headers={"Authorization": f"Bearer {token}"},
         )
         if response.status_code == 200:

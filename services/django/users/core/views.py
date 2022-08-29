@@ -1,12 +1,12 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
-from core.models import CustomUser
+from core.models import User
 from core.serializers import ExternalAuthSerializer
 
 
 class ExternalAuthViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = ExternalAuthSerializer
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     http_method_names: list[str] = ["get"]
 
     def get_queryset(self):

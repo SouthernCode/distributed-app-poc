@@ -1,13 +1,15 @@
 import pika
 
-RABBIT_URL = ""
+from config import get_settings
 
-params = pika.URLParameters(RABBIT_URL)
+# RABBIT_URL = "amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@{RABBITMQ_HOST}"
+
+params = pika.URLParameters(get_settings().rabbit_url)
 connection = pika.BlockingConnection(params)
 
 channel = connection.channel()
 
-channel.queue_declare(queue="transaction")
+channel.queue_declare(queue="transactions")
 
 
 def callback(ch, method, properties, body):
@@ -15,7 +17,7 @@ def callback(ch, method, properties, body):
     pass
 
 
-channel.basic_consume(queue="transaction", on_message_callback=callback)
+channel.basic_consume(queue="transactions", on_message_callback=callback)
 
 print("Started consuming")
 

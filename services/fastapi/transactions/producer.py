@@ -1,8 +1,7 @@
 import pika
+from config import get_settings
 
-RABBIT_URL = ""
-
-params = pika.URLParameters(RABBIT_URL)
+params = pika.URLParameters(get_settings().rabbit_url)
 connection = pika.BlockingConnection(params)
 
 channel = connection.channel()
@@ -11,7 +10,7 @@ channel = connection.channel()
 def publish(exchange, body):
     channel.basic_publish(
         exchange="",
-        routing_key="transaction",
+        routing_key="transactions",
         body=body,
         properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent

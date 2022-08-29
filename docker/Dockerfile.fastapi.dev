@@ -1,0 +1,41 @@
+FROM python:3.10 as builder
+
+# set environment variables for pip
+ENV PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100
+
+# Copy requirements
+COPY ./requirements.txt .
+
+# Build/download all the wheels to /*.whl
+RUN pip wheel --no-cache-dir -r requirements.txt
+
+FROM python:3.10
+
+## install nc
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends netcat-openbsd
+
+# set environment variables for python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+ENV WHEELS=/app/wheels
+
+
+WORKDIR /app
+RUN mkdir $WHEELS
+
+COPY --from=builder *.whl /app/wheels/
+
+RUN pip install --no-cache-dir $WHEELS/*.whl
+
+
+# copy project
+COPY . .
+
+# Chmod all the entrypoint scripts
+RUN chmod 777 /app/entrypoint.sh
+
+# run entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]

@@ -1,0 +1,87 @@
+[
+{
+    "model": "core.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$Yr051RCBLhiTXbKRFyIpZ5$AEwZy+pu6OaRyDx7EObSA4e4DnieUItFpY8cqvIwbis=",
+        "last_login": null,
+        "is_superuser": true,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2022-08-27T17:38:15.044Z",
+        "email": "admin@admin.com",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "core.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$k01msPXQGP1jb2y8VN7Lvx$Gava6ygON8IfttScOkmOx1JLvvTNOtPp7KQVo1SqqIc=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-08-27T17:38:47.891Z",
+        "email": "customer_user_1@test.com",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "core.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$q6tlRSsUfQtSuD7YraFRc0$3wpCYc2CaTOYLyasgOKkIDZ25vcAF3z1CH2L5KT/z+k=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-08-27T17:39:16.876Z",
+        "email": "vendor_user_1@test.com",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "core.user",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$jcje6ttUb88iGAwobcfoEs$/TlbIecOnuwaXbhK3bbvMbbHybspAMP7U44Winvf61Y=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-08-27T17:39:46.120Z",
+        "email": "customer_user_2@test.com",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "core.user",
+    "pk": 5,
+    "fields": {
+        "password": "pbkdf2_sha256$390000$RZvIGM1lTBng8CYTJCjFNa$sk/txP3cFwqNco7qoYaUFl7g7YsZiygXSffBQ4yp6wE=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-08-27T17:40:02.205Z",
+        "email": "vendor_user_2@test.com",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]

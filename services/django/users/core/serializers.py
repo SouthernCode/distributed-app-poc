@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from core.models import CustomUser
+from core.models import User
 
 
 class ExternalAuthSerializer(ModelSerializer):
@@ -10,5 +10,5 @@ class ExternalAuthSerializer(ModelSerializer):
     """
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ["id"]

@@ -13,4 +13,7 @@ python manage.py makemigrations
 echo "Running django migrate"
 python manage.py migrate
 
+echo "Loading default users"
+python manage.py loaddata fixtures/default_users.json
+
 exec "$@"

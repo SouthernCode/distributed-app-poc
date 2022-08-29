@@ -1,36 +1,106 @@
 version: '3.8'
 
 services:
+  # Message Broker
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3.10.7-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    env_file:
+      - ./environment_files/generic/.env.rabbit
 
   # BACKEND SERVICES
   # ----------------
-  # PRODUCTS Service
-  products_db:
+
+  # Users Service
+  users-db:
     image: postgres:14.1-alpine3.15
-    hostname: products_db
+    hostname: users-db
     ports:
       - "5432:5432"
     env_file:
+      - ./environment_files/services/users/.env.db
+
+  users-service:
+    hostname: users-service
+    build:
+      context: ./services/django/users
+      dockerfile: ../../../docker/Dockerfile.django.dev
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app/:/usr/src/app/
+      - type: bind
+        source: ./services/django/users
+        target: /app
+    ports:
+      - 8000:8000
+    working_dir: /app
+    env_file:
+      - ./environment_files/generic/.env.rabbit
+      - ./environment_files/generic/.env.django
+      - ./environment_files/services/users/.env.service
+      - ./environment_files/services/users/.env.db
+
+  # PRODUCTS Service
+  products-db:
+    image: postgres:14.1-alpine3.15
+    hostname: products-db
+    ports:
+      - "5433:5432"
+    env_file:
       - ./environment_files/services/products/.env.db
-  
-  products_service:
+
+  products-service:
     hostname: products-service
     build:
       context: ./services/django/products
       dockerfile: ../../../docker/Dockerfile.django.dev
-    command: python manage.py runserver 0.0.0.0:9001
+    command: python manage.py runserver 0.0.0.0:8001
     volumes:
       - ./app/:/usr/src/app/
       - type: bind
         source: ./services/django/products
         target: /app
     ports:
-      - 9001:9001
+      - 8001:8001
     working_dir: /app
     env_file:
+      - ./environment_files/generic/.env.rabbit
+      - ./environment_files/generic/.env.django
       - ./environment_files/services/products/.env.service
       - ./environment_files/services/products/.env.db
 
+  # TRANSACTIONS Service
+  transactions-db:
+    image: postgres:14.1-alpine3.15
+    hostname: transactions-db
+    ports:
+      - "5433:5432"
+    env_file:
+      - ./environment_files/services/transactions/.env.db
+
+  transactions-service:
+    hostname: transactions-service
+    build:
+      context: ./services/fastapi/transactions
+      dockerfile: ../../../docker/Dockerfile.fastapi.dev
+    volumes:
+      - ./app/:/usr/src/app/
+      - type: bind
+        source: ./services/fastapi/transactions
+        target: /app
+    ports:
+      - 9001:9001
+    working_dir: /app
+    env_file:
+      - ./environment_files/generic/.env.rabbit
+      - ./environment_files/generic/.env.fastapi
+      - ./environment_files/generic/.env.service_urls
+      - ./environment_files/services/transactions/.env.service
+      - ./environment_files/services/transactions/.env.db
 
 volumes:
   postgres_data:
