@@ -1,10 +1,14 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Float
+from sqlalchemy import Column, Integer, DateTime, Float
 from sqlalchemy.orm import relationship
 
 from database import Base
 
 
 class TransactionModel(Base):
+    """
+    Transaction Model used by sqlalchemy
+    """
+
     __tablename__ = "Transactions"
 
     id = Column(Integer, primary_key=True, index=True)

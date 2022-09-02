@@ -2,15 +2,15 @@ version: '3.8'
 
 services:
   # Message Broker
-  rabbitmq:
-    hostname: rabbitmq
-    image: rabbitmq:3.10.7-alpine
-    container_name: rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    env_file:
-      - ./environment_files/generic/.env.rabbit
+  # rabbitmq:
+  #   hostname: rabbitmq
+  #   image: rabbitmq:3.10.7-management-alpine
+  #   container_name: rabbitmq
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+  #   env_file:
+  #     - ./environment_files/generic/.env.rabbit
 
   # BACKEND SERVICES
   # ----------------
@@ -43,6 +43,8 @@ services:
       - ./environment_files/generic/.env.django
       - ./environment_files/services/users/.env.service
       - ./environment_files/services/users/.env.db
+    depends_on:
+      - users-db
 
   # PRODUCTS Service
   products-db:
@@ -59,19 +61,43 @@ services:
       context: ./services/django/products
       dockerfile: ../../../docker/Dockerfile.django.dev
     command: python manage.py runserver 0.0.0.0:8001
+    ports:
+      - 8001:8001
     volumes:
       - ./app/:/usr/src/app/
       - type: bind
         source: ./services/django/products
         target: /app
-    ports:
-      - 8001:8001
     working_dir: /app
     env_file:
       - ./environment_files/generic/.env.rabbit
       - ./environment_files/generic/.env.django
       - ./environment_files/services/products/.env.service
       - ./environment_files/services/products/.env.db
+    depends_on:
+      - products-db
+
+  products-service-consumer:
+    hostname: products-service-consumer
+    build:
+      context: ./services/django/products
+      dockerfile: ../../../docker/Dockerfile.django.dev
+    command: python manage.py start_consuming
+    volumes:
+      - ./app/:/usr/src/app/
+      - type: bind
+        source: ./services/django/products
+        target: /app
+    working_dir: /app
+    env_file:
+      - ./environment_files/generic/.env.rabbit
+      - ./environment_files/generic/.env.django
+      - ./environment_files/services/products/.env.service
+      - ./environment_files/services/products/.env.db
+    environment:
+      - IS_CONSUMER=1
+    depends_on:
+      - products-db
 
   # TRANSACTIONS Service
   transactions-db:
@@ -92,7 +118,6 @@ services:
       - type: bind
         source: ./services/fastapi/transactions
         target: /app
-    # command: uvicorn main:app --proxy-headers --host 0.0.0.0 --port 9001 --reload
     ports:
       - 9001:9001
     working_dir: /app
@@ -102,27 +127,30 @@ services:
       - ./environment_files/generic/.env.service_urls
       - ./environment_files/services/transactions/.env.service
       - ./environment_files/services/transactions/.env.db
-
-  transactions-service-consumer:
-    hostname: transactions-service-consumer
-    build:
-      context: ./services/fastapi/transactions
-      dockerfile: ../../../docker/Dockerfile.fastapi.dev
-    volumes:
-      - ./app/:/usr/src/app/
-      - type: bind
-        source: ./services/fastapi/transactions
-        target: /app
-    command: python consumer.py
-    working_dir: /app
-    env_file:
-      - ./environment_files/generic/.env.rabbit
-      - ./environment_files/generic/.env.fastapi
-      - ./environment_files/generic/.env.service_urls
-      - ./environment_files/services/transactions/.env.service
-      - ./environment_files/services/transactions/.env.db
-    environment:
-      - IS_CONSUMER=1
+    depends_on:
+      - transactions-db
+  # transactions-service-consumer:
+  #   hostname: transactions-service-consumer
+  #   build:
+  #     context: ./services/fastapi/transactions
+  #     dockerfile: ../../../docker/Dockerfile.fastapi.dev
+  #   volumes:
+  #     - ./app/:/usr/src/app/
+  #     - type: bind
+  #       source: ./services/fastapi/transactions
+  #       target: /app
+  #   command: python consumer.py
+  #   working_dir: /app
+  #   env_file:
+  #     - ./environment_files/generic/.env.rabbit
+  #     - ./environment_files/generic/.env.fastapi
+  #     - ./environment_files/generic/.env.service_urls
+  #     - ./environment_files/services/transactions/.env.service
+  #     - ./environment_files/services/transactions/.env.db
+  #   environment:
+  #     - IS_CONSUMER=1
+  #   depends_on:
+  #     - transactions-db
 
 volumes:
   postgres_data:

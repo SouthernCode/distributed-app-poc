@@ -7,10 +7,16 @@ while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
   sleep 0.1
 done
 
-echo "Running django makemigrations"
-python manage.py makemigrations
+if [ "$IS_CONSUMER" = "1" ]
+then
+    echo "Transactions service message broker consumer starting"
+    # exec python consumer.py
+else
+    echo "Running django makemigrations"
+    python manage.py makemigrations
 
-echo "Running django migrate"
-python manage.py migrate
+    echo "Running django migrate"
+    python manage.py migrate
+fi
 
 exec "$@"

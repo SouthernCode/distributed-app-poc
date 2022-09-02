@@ -1,31 +1,24 @@
 from datetime import datetime
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from models.TransactionModel import TransactionModel
 from schemas import transaction_schemas
 from auth import AuthHandler
 from database import SessionLocal, engine
 import crud
 from sqlalchemy.orm import Session
+from database import get_db
 
 from broker import Broker
 
 message_broker = Broker()
 
-
 TransactionModel.metadata.create_all(bind=engine)
-
 
 auth_handler = AuthHandler()
 
 app = FastAPI()
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+db = get_db()
 
 
 @app.get("/")
@@ -62,6 +55,7 @@ async def get_transaction(
 @app.post("/api/transactions/", response_model=transaction_schemas.Transaction)
 async def create_transaction(
     transaction: transaction_schemas.TransactionCreate,
+    background_tasks: BackgroundTasks,
     user=Depends(auth_handler.auth_wrapper),
     db: Session = Depends(get_db),
 ):
@@ -71,8 +65,10 @@ async def create_transaction(
     transaction_response = transaction_schemas.Transaction(
         **created_transaction.__dict__
     )
-    message_broker.publish(
-        "transaction", f"created a transaction with: {transaction_response.json()}"
+    broker_message = transaction_schemas.TransactionMessage(
+        action="created", transaction=transaction_response
     )
+
+    background_tasks.add_task(message_broker.publish, body=broker_message.json())
 
     return created_transaction

@@ -28,10 +28,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "corsheaders",
     "core",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -122,3 +124,10 @@ REST_FRAMEWORK = {
     ],
     "PAGE_SIZE": 10,
 }
+
+# Broker settings
+RABBITMQ_URL = os.getenv("RABBITMQ_URL_STRING")
+
+# CORS HEADERS CONFIGURATION
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins must be False for production
+# CORS_ALLOWED_ORIGINS = [] Set this to allow only specific origins in production

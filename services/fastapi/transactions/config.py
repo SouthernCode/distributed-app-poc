@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 from functools import lru_cache
-from pathlib import Path
 
 from pydantic import BaseSettings, AnyUrl
 
@@ -15,10 +14,11 @@ class Settings(BaseSettings):
     environment: str = os.getenv("ENVIRONMENT", "dev")
 
     """Database configurations"""
-    # database_url: AnyUrl = get_database_url()
-    # database_name: str = "fast-geo"
-    # database_user: str = os.getenv("ARANGO_USER", "root")
-    # database_password: str = os.getenv("ARANGO_PWD", "openSesame")
+    database_name: str = os.getenv("POSTGRES_DB")
+    database_user: str = os.getenv("POSTGRES_USER")
+    database_password: str = os.getenv("POSTGRES_PASSWORD")
+    database_host: str = os.getenv("POSTGRES_HOST")
+    database_url: AnyUrl = f"postgresql://{database_user}:{database_password}@{database_host}/{database_name}"
     """Testing configurations"""
     testing: bool = "unittest" in sys.modules.keys()
     test_database_name: str = "testdb"

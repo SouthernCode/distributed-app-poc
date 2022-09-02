@@ -11,4 +11,4 @@ class ExternalAuthSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id"]
+        fields = ["id", "user_permissions", "groups"]

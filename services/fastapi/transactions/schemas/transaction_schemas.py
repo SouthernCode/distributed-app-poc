@@ -5,6 +5,8 @@ from datetime import datetime
 class TransactionBase(BaseModel):
     """
     Base class for Transaction model
+    Used by pydantic to validate the model
+    And by fastapi to validate request bodies and return responses
     """
 
     user_id: int
@@ -45,3 +47,13 @@ class Transaction(TransactionBase):
 
     class Config:
         orm_mode = True
+
+
+class TransactionMessage(BaseModel):
+    """
+    Class for Transaction message to be
+    sent to the message broker
+    """
+
+    action: str
+    transaction: Transaction
